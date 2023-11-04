@@ -11,11 +11,15 @@
                     "logs": {},
                     "metrics": {},
                     "listen": [
-                        ":443"
+                        ":443",
+                        "scion/[19-ffaa:1:7d0,134.122.70.13]:443"
                     ],
                     "routes": [
                         {
                             "handle": [
+                                {
+                                    "handler": "scion"
+                                },
                                 {
                                     "handler": "reverse_proxy",
                                     "upstreams": [

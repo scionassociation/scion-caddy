@@ -31,7 +31,8 @@ const helloTemplateText = `<head>
 
 <body>
 <h1>Welcome</h1>
-<p>Hello {{.}}.</p>
+<p>Hello {{.Addr}}.</p>
+<p>Using SCION {{.SCION}}.</p>
 </body>
 `
 
@@ -40,7 +41,19 @@ var helloTemplate = template.Must(template.New("foo").Parse(helloTemplateText))
 type helloHandler struct{}
 
 func (h *helloHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	err := helloTemplate.Execute(w, req.Header.Get("x-forwarded-for"))
+
+	err := helloTemplate.Execute(w, struct {
+		Addr  string
+		SCION string
+	}{
+		Addr: func() string {
+			if addr := req.Header.Get("X-Scion-Remote-Addr"); addr != "" {
+				return addr
+			}
+			return req.RemoteAddr
+		}(),
+		SCION: req.Header.Get("X-Scion"),
+	})
 	if err != nil {
 		panic(err)
 	}
